@@ -10,6 +10,7 @@ import {
   useGetUpazilasQuery,
   useGetUnionsQuery,
 } from "../redux/features/geo/geoApi";
+import { useRegisterUserMutation } from '../redux/features/users/authApiSlice.js'
 
 // ─── constants ────────────────────────────────────────────────────────────────
 
@@ -34,6 +35,10 @@ const INITIAL_FORM = {
   upazilaId: '',
   unionId: '',
   phone: '',
+  email: '',
+  password: '',
+  confirmPassword: '',
+  role: 'USER',
   agree: false,
 };
 
@@ -65,6 +70,21 @@ function validate(form) {
   else if (!/^01[3-9]\d{8}$/.test(form.phone.replace(/\D/g, '')))
     errs.phone = 'Enter a valid Bangladeshi mobile number';
 
+  if (!form.email.trim())
+    errs.email = 'Email is required';
+  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
+    errs.email = 'Enter a valid email address';
+
+  if (!form.password)
+    errs.password = 'Password is required';
+  else if (form.password.length < 6)
+    errs.password = 'Password must be at least 6 characters';
+
+  if (!form.confirmPassword)
+    errs.confirmPassword = 'Confirm password is required';
+  else if (form.password !== form.confirmPassword)
+    errs.confirmPassword = 'Passwords do not match';
+
   if (!form.agree)
     errs.agree = 'You must agree to the terms';
 
@@ -74,10 +94,11 @@ function validate(form) {
 // ─── component ────────────────────────────────────────────────────────────────
 
 export default function Register() {
+  const [registerUser, { isLoading: isRegistering }] = useRegisterUserMutation();
   const [form, setForm] = useState(INITIAL_FORM);
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [submittedData, setSubmittedData] = useState(null);
   const [toast, setToast] = useState(null);
 
   // ── geo queries ─────────────────────────────────────────────────────────────
@@ -132,27 +153,49 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const errs = validate(form);
-    if (Object.keys(errs).length) { setErrors(errs); return; }
+    if (Object.keys(errs).length) {
+      setErrors(errs);
+      return;
+    }
 
-    setLoading(true);
-    await new Promise(r => setTimeout(r, 1400)); // replace with real API call
-    setLoading(false);
-    setSubmitted(true);
-    setToast({ message: 'Registration successful! Welcome to RedPulse 🩸', type: 'success' });
-    console.log("form", form);
+    const payload = {
+      fullName: form.name.trim(),
+      age: Number(form.age),
+      bloodGroup: form.blood,
+      division: divisions.find((item) => String(item.id) === String(form.divisionId))?.name || '',
+      district: districts.find((item) => String(item.id) === String(form.districtId))?.name || '',
+      upazila: upazilas.find((item) => String(item.id) === String(form.upazilaId))?.name || '',
+      union: unions.find((item) => String(item.id) === String(form.unionId))?.name || '',
+      phoneNumber: form.phone.replace(/\D/g, ''),
+      email: form.email.trim().toLowerCase(),
+      password: form.password,
+      role: form.role,
+    };
 
-    // reset form
-    setForm(INITIAL_FORM);
-    setErrors({});
-    setToast(null);
-
-    // TODO: replace with real API call and handle errors
+    try {
+      const result = await registerUser(payload).unwrap();
+      setSubmittedData(payload);
+      setSubmitted(true);
+      setForm(INITIAL_FORM);
+      setErrors({});
+      setToast({
+        message: result?.message || 'Registration successful! Welcome to RedPulse 🩸',
+        type: 'success',
+      });
+    } catch (err) {
+      setToast({
+        message: err?.data?.message || 'Registration failed. Please try again.',
+        type: 'error',
+      });
+      setErrors((prev) => ({ ...prev, submit: err?.data?.message || 'Registration failed' }));
+    }
   };
 
   const handleReset = () => {
     setForm(INITIAL_FORM);
     setErrors({});
     setSubmitted(false);
+    setSubmittedData(null);
     setToast(null);
   };
 
@@ -190,17 +233,17 @@ export default function Register() {
           </h2>
           <p className="text-gray-500 dark:text-gray-400 mb-1">
             Welcome to RedPulse,{' '}
-            <span className="font-semibold text-gray-900 dark:text-white">{form.name}</span>!
+            <span className="font-semibold text-gray-900 dark:text-white">{submittedData?.fullName || 'Donor'}</span>!
           </p>
           <p className="text-gray-500 dark:text-gray-400 text-sm mb-2">
             Registered as a{' '}
             <span className="inline-flex items-center gap-1 bg-red-50 dark:bg-red-950/50 text-red-600 dark:text-red-400 font-bold px-2 py-0.5 rounded-lg">
-              {form.blood}
+              {submittedData?.bloodGroup || '—'}
             </span>{' '}
             donor.
           </p>
           <p className="text-gray-400 dark:text-gray-500 text-sm mb-10">
-            📍 {resolvedLocation}
+            📍 {[submittedData?.division, submittedData?.district].filter(Boolean).join(', ') || '—'}
           </p>
 
           {/* Stat row */}
@@ -325,7 +368,7 @@ export default function Register() {
                 </fieldset>
 
                 {/* ── Divider ───────────────────────────────────────────────── */}
-                <div className="border-t border-dashed border-gray-100 dark:border-gray-800" />
+                {/* <div className="border-t border-dashed border-gray-100 dark:border-gray-800" /> */}
 
                 {/* ── Section: Location ─────────────────────────────────────── */}
                 <fieldset>
@@ -378,7 +421,7 @@ export default function Register() {
                 </fieldset>
 
                 {/* ── Divider ───────────────────────────────────────────────── */}
-                <div className="border-t border-dashed border-gray-100 dark:border-gray-800" />
+                {/* <div className="border-t border-dashed border-gray-100 dark:border-gray-800" /> */}
 
                 {/* ── Section: Contact ──────────────────────────────────────── */}
                 <fieldset>
@@ -387,16 +430,68 @@ export default function Register() {
                     Contact
                   </legend>
 
-                  <Input
-                    label="Phone Number"
-                    name="phone"
-                    type="tel"
-                    value={form.phone}
-                    onChange={handleChange}
-                    placeholder="e.g. 01712345678"
-                    error={errors.phone}
-                    required
-                  />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                    <Input
+                      label="Phone Number"
+                      name="phone"
+                      type="tel"
+                      value={form.phone}
+                      onChange={handleChange}
+                      placeholder="e.g. 01712345678"
+                      error={errors.phone}
+                      required
+                    />
+
+                    <Input
+                      label="Email"
+                      name="email"
+                      type="email"
+                      value={form.email}
+                      onChange={handleChange}
+                      placeholder="e.g. ab@cd.com"
+                      error={errors.email}
+                      required
+                    />
+
+                  </div>
+                </fieldset>
+
+                {/* ── Divider ───────────────────────────────────────────────── */}
+                {/* <div className="border-t border-dashed border-gray-100 dark:border-gray-800" /> */}
+
+                {/* ── Section: Password ──────────────────────────────────────── */}
+                <fieldset>
+                  <legend className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4">
+                    <span className="flex-shrink-0 w-5 h-5 rounded-full bg-red-100 dark:bg-red-950/50 text-red-500 flex items-center justify-center text-[10px] font-bold">3</span>
+                    Password
+                  </legend>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                    <Input
+                      label="Password"
+                      name="password"
+                      type="password"
+                      value={form.password}
+                      onChange={handleChange}
+                      placeholder="e.g. Anything"
+                      error={errors.password}
+                      required
+                    />
+
+                    <Input
+                      label="Confirm Password"
+                      name="confirmPassword"
+                      type="password"
+                      value={form.confirmPassword}
+                      onChange={handleChange}
+                      placeholder="e.g. Anything"
+                      error={errors.confirmPassword}
+                      required
+                    />
+
+                  </div>
                 </fieldset>
 
                 {/* ── Agreement ─────────────────────────────────────────────── */}
@@ -425,8 +520,8 @@ export default function Register() {
                 </div>
 
                 {/* ── Submit ────────────────────────────────────────────────── */}
-                <Button type="submit" fullWidth size="lg" loading={loading}>
-                  {loading ? 'Registering...' : 'Register as Donor 🩸'}
+                <Button type="submit" fullWidth size="lg" loading={isRegistering}>
+                  {isRegistering ? 'Registering...' : 'Register as Donor 🩸'}
                 </Button>
 
               </form>
@@ -448,8 +543,8 @@ export default function Register() {
           </div>
 
         </div>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 }
 
