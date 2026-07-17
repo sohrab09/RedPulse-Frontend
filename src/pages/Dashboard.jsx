@@ -135,7 +135,13 @@ export default function Dashboard() {
                                     </div>
                                     <div className="mt-5">
                                         <p className="text-lg font-semibold">Mohammad Sohrab Hossain</p>
-                                        <p className="mt-1 text-sm text-red-50">Blood Donor • Verified</p>
+                                        <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-white/20 px-3 py-1 text-sm text-red-50">
+                                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14c-4.418 0-8 2.239-8 5v1h16v-1c0-2.761-3.582-5-8-5z" />
+                                            </svg>
+                                            Male
+                                        </div>
+                                        <p className="mt-2 text-sm text-red-50">Blood Donor • Verified</p>
                                     </div>
                                 </div>
 

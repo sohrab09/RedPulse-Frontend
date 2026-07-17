@@ -29,6 +29,7 @@ const TRUST_BADGES = [
 const INITIAL_FORM = {
   name: '',
   age: '',
+  gender: '',
   blood: '',
   divisionId: '',
   districtId: '',
@@ -56,6 +57,9 @@ function validate(form) {
     errs.age = 'Age is required';
   else if (Number(form.age) < 18 || Number(form.age) > 65)
     errs.age = 'Age must be between 18 and 65';
+
+  if (!form.gender)
+    errs.gender = 'Please select your gender';
 
   if (!form.blood)
     errs.blood = 'Please select your blood group';
@@ -161,6 +165,7 @@ export default function Register() {
     const payload = {
       fullName: form.name.trim(),
       age: Number(form.age),
+      gender: form.gender,
       bloodGroup: form.blood,
       division: divisions.find((item) => String(item.id) === String(form.divisionId))?.name || '',
       district: districts.find((item) => String(item.id) === String(form.districtId))?.name || '',
@@ -246,26 +251,9 @@ export default function Register() {
             📍 {[submittedData?.division, submittedData?.district].filter(Boolean).join(', ') || '—'}
           </p>
 
-          {/* Stat row */}
-          <div className="grid grid-cols-3 gap-3 mb-8 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-2xl">
-            {[
-              { value: '1', label: 'Life saved' },
-              { value: '3', label: 'People helped' },
-              { value: '∞', label: 'Impact' },
-            ].map(({ value, label }) => (
-              <div key={label}>
-                <div className="text-2xl font-bold text-red-500">{value}</div>
-                <div className="text-xs text-gray-400 mt-0.5">{label}</div>
-              </div>
-            ))}
-          </div>
-
           <div className="flex flex-col gap-3">
             <Button onClick={handleReset} variant="secondary" fullWidth>
               Register Another Donor
-            </Button>
-            <Button variant="ghost" fullWidth>
-              View My Profile
             </Button>
           </div>
         </div>
@@ -362,6 +350,23 @@ export default function Register() {
                       options={[
                         { value: '', label: 'Select blood group' },
                         ...bloodGroups.filter(g => g !== 'All').map(g => ({ value: g, label: g })),
+                      ]}
+                    />
+                  </div>
+                  <div className="mt-2">
+                    <Input
+                      label="Gender"
+                      name="gender"
+                      as="select"
+                      value={form.gender}
+                      onChange={handleChange}
+                      error={errors.gender}
+                      required
+                      options={[
+                        { value: '', label: 'Select gender' },
+                        { value: 'Male', label: 'Male' },
+                        { value: 'Female', label: 'Female' },
+                        { value: 'Others', label: 'Others' },
                       ]}
                     />
                   </div>

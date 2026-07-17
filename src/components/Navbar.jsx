@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react'
-import { Link, NavLink, useNavigate } from 'react-router-dom'
+import React, { useState, useEffect, useRef } from 'react'
+import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import logo from '../assets/logo.png';
+
 const navLinks = [
   { to: '/', label: 'Home' },
   { to: '/find-donor', label: 'Find Donor' },
@@ -12,7 +13,10 @@ const navLinks = [
 export default function Navbar({ darkMode, setDarkMode, isLoggedIn, setIsLoggedIn }) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [profileOpen, setProfileOpen] = useState(false);
   const navigate = useNavigate()
+  const location = useLocation()
+  const profileRef = useRef(null)
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 20)
@@ -20,18 +24,41 @@ export default function Navbar({ darkMode, setDarkMode, isLoggedIn, setIsLoggedI
     return () => window.removeEventListener('scroll', handler)
   }, [])
 
-  // Close mobile menu on route change
   useEffect(() => {
     setMobileOpen(false)
-  }, [])
+    setProfileOpen(false)
+  }, [location.pathname])
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setProfileOpen(false)
+      }
+    }
+
+    if (profileOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+      document.addEventListener('touchstart', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('touchstart', handleClickOutside)
+    }
+  }, [profileOpen])
 
   const handleLogout = () => {
-    try {
-      localStorage.removeItem('redpulse_token')
-    } catch { }
+    localStorage.removeItem('redpulse_token')
     setIsLoggedIn(false)
+    setProfileOpen(false)
     navigate('/')
   }
+
+  const handleDashboard = () => {
+    if (isLoggedIn) {
+      navigate('/dashboard')
+    }
+  };
 
   return (
     <>
@@ -48,11 +75,8 @@ export default function Navbar({ darkMode, setDarkMode, isLoggedIn, setIsLoggedI
               </div>
               <span className="font-display text-2xl font-bold text-gray-900 dark:text-white">
                 Red
-
                 <span className="relative text-red-500 inline-block ml-1">
                   Pulse
-
-                  {/* heartbeat line through text */}
                   <svg
                     className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-5 text-red-500 pointer-events-none"
                     viewBox="0 0 100 20"
@@ -109,14 +133,96 @@ export default function Navbar({ darkMode, setDarkMode, isLoggedIn, setIsLoggedI
               </button>
 
               {isLoggedIn ? (
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center text-white text-sm font-bold">U</div>
+                <div className="relative" ref={profileRef}>
                   <button
-                    onClick={handleLogout}
-                    className="text-sm text-gray-500 hover:text-red-500 font-medium transition-colors cursor-pointer"
+                    onClick={() => setProfileOpen(!profileOpen)}
+                    className="flex items-center gap-2 cursor-pointer focus:outline-none"
+                    aria-expanded={profileOpen}
+                    aria-haspopup="true"
                   >
-                    Logout
+                    <div className="w-10 h-10 rounded-full bg-red-500 flex items-center justify-center text-white font-bold">
+                      S
+                    </div>
+                    <svg
+                      className={`w-4 h-4 transition-transform duration-200 ${profileOpen ? "rotate-180" : ""}`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
                   </button>
+
+                  {profileOpen && (
+                    <div className="absolute right-0 mt-3 w-72 bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden z-50 animate-fade-in">
+                      <div className="px-5 py-4 border-b border-gray-100 dark:border-gray-800">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 rounded-full bg-red-500 flex items-center justify-center text-white font-bold text-lg">
+                            S
+                          </div>
+                          <div>
+                            <h4 className="font-semibold text-gray-900 dark:text-white">
+                              Mohammad Sohrab Hossain
+                            </h4>
+                            <p className="text-xs text-gray-500">
+                              sohrab@gmail.com
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <Link
+                        to="/dashboard/profile"
+                        onClick={() => setProfileOpen(false)}
+                        className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition"
+                      >
+                        <span className="text-lg">👤</span>
+                        <span className="text-sm font-medium">My Profile</span>
+                      </Link>
+
+                      <Link
+                        to="/dashboard"
+                        onClick={() => setProfileOpen(false)}
+                        className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition"
+                      >
+                        <span className="text-lg">📊</span>
+                        <span className="text-sm font-medium">Dashboard</span>
+                      </Link>
+
+                      <Link
+                        to="/dashboard/donations"
+                        onClick={() => setProfileOpen(false)}
+                        className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition"
+                      >
+                        <span className="text-lg">❤️</span>
+                        <span className="text-sm font-medium">Donation History</span>
+                      </Link>
+
+                      <Link
+                        to="/dashboard/settings"
+                        onClick={() => setProfileOpen(false)}
+                        className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition"
+                      >
+                        <span className="text-lg">⚙️</span>
+                        <span className="text-sm font-medium">Settings</span>
+                      </Link>
+
+                      <div className="border-t border-gray-100 dark:border-gray-800">
+                        <button
+                          className="w-full flex items-center gap-3 px-5 py-3 text-red-500 hover:bg-red-50 dark:hover:bg-red-950 transition cursor-pointer"
+                          onClick={handleLogout}
+                        >
+                          <span className="text-lg">🚪</span>
+                          <span className="text-sm font-medium">Logout</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <Link

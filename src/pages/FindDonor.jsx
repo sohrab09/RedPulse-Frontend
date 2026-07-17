@@ -26,6 +26,7 @@ export default function FindDonor() {
       phone: user.phoneNumber || '—',
       email: user.email || '—',
       role: user.role || 'USER',
+      gender: user.gender || 'Others',
       lastDonated: user.updatedAt || user.createdAt || null,
       available: true,
     }));

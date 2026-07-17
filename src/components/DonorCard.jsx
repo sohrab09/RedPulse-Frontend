@@ -58,10 +58,18 @@ export default function DonorCard({ donor }) {
           </span>
         </div>
 
-        {/* Age */}
-        <span className="text-xs text-gray-400">
-          Age {donor.age}
-        </span>
+        {/* Age / Gender */}
+        <div className="text-right">
+          <span className="text-xs text-gray-400 block">Age {donor.age}</span>
+          {donor.gender && (
+            <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 inline-flex items-center gap-1">
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14c-4.418 0-8 2.239-8 5v1h16v-1c0-2.761-3.582-5-8-5z" />
+              </svg>
+              {donor.gender}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Last donated */}
