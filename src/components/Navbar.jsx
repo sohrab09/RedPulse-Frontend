@@ -26,6 +26,9 @@ export default function Navbar({ darkMode, setDarkMode, isLoggedIn, setIsLoggedI
   }, [])
 
   const handleLogout = () => {
+    try {
+      localStorage.removeItem('redpulse_token')
+    } catch { }
     setIsLoggedIn(false)
     navigate('/')
   }

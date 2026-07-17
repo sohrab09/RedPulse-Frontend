@@ -99,7 +99,7 @@ export default function Home() {
             {bloodTypes.map(group => (
               <Link
                 key={group}
-                to={`/find-donor?blood=${group}`}
+                to={`/find-donor?blood=${encodeURIComponent(group)}`}
                 className="aspect-square flex items-center justify-center rounded-2xl bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 hover:border-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-600 dark:hover:text-red-400 font-display font-bold text-gray-700 dark:text-gray-300 transition-all duration-200 text-sm shadow-sm hover:shadow-md card-hover"
               >
                 {group}

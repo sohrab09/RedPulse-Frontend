@@ -48,7 +48,11 @@ export default function FindDonor() {
 
   useEffect(() => {
     const b = searchParams.get('blood')
-    if (b) setBloodFilter(b)
+    if (b) {
+      setBloodFilter(b)
+    } else {
+      setBloodFilter('All')
+    }
   }, [searchParams])
 
   const filtered = useMemo(() => {

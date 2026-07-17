@@ -11,6 +11,8 @@ import Contact from './pages/Contact.jsx'
 import More from './pages/More.jsx'
 import Login from './pages/Login.jsx'
 import NotFound from './pages/NotFound.jsx'
+import Dashboard from './pages/Dashboard.jsx'
+import ProtectedRoute from './components/ProtectedRoute.jsx'
 
 // Pages without footer
 const NO_FOOTER_ROUTES = ['/login']
@@ -19,7 +21,13 @@ export default function App() {
   const [darkMode, setDarkMode] = useState(() => {
     try { return localStorage.getItem('rp-dark') === 'true' } catch { return false }
   })
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    try {
+      return Boolean(localStorage.getItem('redpulse_token'))
+    } catch {
+      return false
+    }
+  })
 
   const location = useLocation()
   const showFooter = !NO_FOOTER_ROUTES.includes(location.pathname)
@@ -55,6 +63,14 @@ export default function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/more" element={<More />} />
           <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute isLoggedIn={isLoggedIn}>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
