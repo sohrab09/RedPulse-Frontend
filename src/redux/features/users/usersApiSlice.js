@@ -21,6 +21,25 @@ export const usersApi = createApi({
             invalidatesTags: ["User"],
         }),
 
+        // ✅ NEW: Send verification code
+        sendVerificationEmail: builder.mutation({
+            query: () => ({
+                url: "/users/me/send-verification",
+                method: "POST",
+            }),
+            invalidatesTags: ["User"],
+        }),
+
+        // ✅ NEW: Verify email with code
+        verifyEmail: builder.mutation({
+            query: (code) => ({
+                url: "/users/me/verify-email",
+                method: "POST",
+                body: { code },
+            }),
+            invalidatesTags: ["User"],
+        }),
+
         updateUserProfile: builder.mutation({
             query: (data) => ({
                 url: `/users/${data.id}`,
@@ -32,4 +51,10 @@ export const usersApi = createApi({
     }),
 });
 
-export const { useGetUserProfileQuery, useUpdateAvailabilityMutation, useUpdateUserProfileMutation } = usersApi;
+export const {
+    useGetUserProfileQuery,
+    useUpdateAvailabilityMutation,
+    useSendVerificationEmailMutation,  // ✅
+    useVerifyEmailMutation,              // ✅
+    useUpdateUserProfileMutation,
+} = usersApi;

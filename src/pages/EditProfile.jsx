@@ -7,6 +7,7 @@ import {
     useGetUnionsQuery,
 } from "../redux/features/geo/geoApi";
 import { useGetUserProfileQuery, useUpdateUserProfileMutation } from '../redux/features/users/usersApiSlice'
+import EmailVerification from './EmailVerification';
 
 // ==================== ICONS ====================
 const IconArrowLeft = ({ className }) => (
@@ -353,6 +354,10 @@ const EditProfile = () => {
                             <p className="text-xs text-red-200 mt-1">{userData?.phoneNumber}</p>
                         </div>
                     </div>
+                </div>
+
+                <div className="mb-8">
+                    <EmailVerification user={userData} />
                 </div>
 
                 {/* Form */}

@@ -109,7 +109,7 @@ export default function DonorCard({ donor }) {
 
   // Determine button state
   const isButtonDisabled = !donor.available || contacted || isSending || isBlocked;
-  const isButtonHidden = isBlocked; // Hide button when blocked
+  const isButtonHidden = isBlocked;
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-6 card-hover relative overflow-hidden group">
@@ -123,9 +123,19 @@ export default function DonorCard({ donor }) {
             {donor.name.charAt(0)}
           </div>
           <div>
-            <h3 className="font-semibold text-gray-900 dark:text-white text-base leading-tight">
-              {donor.name}
-            </h3>
+            <div className="flex items-center gap-1.5">
+              <h3 className="font-semibold text-gray-900 dark:text-white text-base leading-tight">
+                {donor.name}
+              </h3>
+              {/* ✅ Verified Badge */}
+              {donor.isEmailVerified && (
+                <span title="Email Verified" className="text-blue-500">
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                </span>
+              )}
+            </div>
             <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1 mt-0.5">
               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
