@@ -29,7 +29,8 @@ export default function FindDonor() {
       gender: user.gender || 'Others',
       lastDonated: user.updatedAt || user.createdAt || null,
       available: user.isAvailable || false,
-      isEmailVerified: user.isEmailVerified || false
+      isEmailVerified: user.isEmailVerified || false,
+      lastSeen: user.lastSeen || null
     }));
   }, [data]);
 

@@ -39,6 +39,27 @@ function BlockTimer({ onExpire }) {
   );
 }
 
+// Helper function (DonorCard.jsx-এর উপরে বা separate file-এ)
+function formatLastSeen(dateString) {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffMs = now - date;
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+
+  if (diffMins < 1) return 'Just now';
+  if (diffMins < 60) return `${diffMins}m ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffDays < 7) return `${diffDays}d ago`;
+
+  return date.toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
+}
+
 export default function DonorCard({ donor }) {
   const navigate = useNavigate();
   const [contacted, setContacted] = useState(false);
@@ -175,12 +196,18 @@ export default function DonorCard({ donor }) {
         </div>
       </div>
 
-      {/* Last donated */}
+      {/* Last seen */}
       <div className="text-xs text-gray-400 dark:text-gray-500 mb-4 flex items-center gap-1">
         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        Last activity: {lastDonatedLabel}
+        {donor.lastSeen ? (
+          <span>
+            Last seen: <span className="font-medium">{formatLastSeen(donor.lastSeen)}</span>
+          </span>
+        ) : (
+          "Recently joined"
+        )}
       </div>
 
       {/* Error message */}
