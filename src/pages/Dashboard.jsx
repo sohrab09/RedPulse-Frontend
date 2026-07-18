@@ -1,240 +1,7 @@
-// import React, { useEffect, useState } from 'react'
-// import { useGetUserProfileQuery, useUpdateAvailabilityMutation } from '../redux/features/users/authApiSlice'
-// import { useNavigate } from 'react-router-dom';
-// import Toast from '../components/Toast';
-// import ErrorState from '../components/Error';
-// import EmptyState from '../components/Empty';
-
-// const SkeletonPulse = ({ className = "" }) => (
-//     <div className={`animate-pulse rounded-xl bg-gray-200 dark:bg-gray-700 ${className}`} />
-// );
-
-// const ProfileSkeleton = () => (
-//     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-red-50/40 px-4 py-6 sm:px-6 lg:px-8 dark:from-gray-950 dark:via-gray-900 dark:to-red-950/20">
-//         <div className="mx-auto max-w-7xl space-y-6">
-//             {/* Header Skeleton */}
-//             <div className="rounded-[28px] border border-gray-200/70 bg-white/80 p-6 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.15)] backdrop-blur-xl dark:border-gray-800 dark:bg-gray-900/80">
-//                 <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-//                     <div className="space-y-3">
-//                         <SkeletonPulse className="h-4 w-40" />
-//                         <SkeletonPulse className="h-10 w-80" />
-//                         <SkeletonPulse className="h-4 w-96" />
-//                     </div>
-//                     <SkeletonPulse className="h-16 w-48 rounded-2xl" />
-//                 </div>
-//             </div>
-//             {/* Content Skeleton */}
-//             <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-//                 <SkeletonPulse className="h-[500px] rounded-[28px]" />
-//                 <SkeletonPulse className="h-[300px] rounded-[28px]" />
-//             </div>
-//         </div>
-//     </div>
-// );
-
-// const Dashboard = () => {
-//     const navigate = useNavigate();
-//     const { data: user, isLoading, isError, error, refetch } = useGetUserProfileQuery();
-//     const [updateAvailability] = useUpdateAvailabilityMutation();
-
-//     const [availability, setAvailability] = useState(false);
-//     const [lastUpdated, setLastUpdated] = useState(null);
-//     const [toast, setToast] = useState(null);
-
-//     useEffect(() => {
-//         if (user?.data) {
-//             setAvailability(user.data.isAvailable);
-//             setLastUpdated(new Date());
-//         }
-//     }, [user]);
-
-//     const showToast = (message, type = 'success') => {
-//         setToast({ message, type });
-//     };
-
-//     const handleAvailability = async () => {
-//         const newValue = !availability;
-
-//         try {
-//             await updateAvailability(newValue).unwrap();
-//             setAvailability(newValue);
-//             setLastUpdated(new Date());
-//             showToast(newValue ? 'You are now available for donation!' : 'You are now unavailable for donation.');
-//         } catch (err) {
-//             console.error(err);
-//             showToast(err?.data?.message || 'Failed to update availability. Please try again.', 'error');
-//         }
-//     };
-
-//     if (isLoading) {
-//         return <ProfileSkeleton />;
-//     }
-
-//     if (isError) {
-//         return <ErrorState error={error} onRetry={refetch} />;
-//     }
-
-//     if (!user?.data) {
-//         return <EmptyState onRefresh={refetch} />;
-//     }
-
-//     const userData = user.data;
-//     const initials = userData?.fullName
-//         ?.split(" ")
-//         .map((n) => n[0])
-//         .slice(0, 2)
-//         .join("")
-//         .toUpperCase() || 'U';
-
-//     const handleEditProfile = () => {
-//         navigate('/dashboard/edit-profile');
-//     }
-
-//     return (
-//         <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-red-50/40 px-4 py-6 sm:px-6 lg:px-8 dark:from-gray-950 dark:via-gray-900 dark:to-red-950/20">
-//             {/* Toast Notification */}
-//             {toast && (
-//                 <Toast
-//                     message={toast.message}
-//                     type={toast.type}
-//                     onClose={() => setToast(null)}
-//                 />
-//             )}
-
-//             <div className="mx-auto max-w-7xl space-y-6">
-//                 {/* Header */}
-//                 <header className="rounded-[28px] border border-gray-200/70 bg-white/80 p-6 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.15)] backdrop-blur-xl dark:border-gray-800 dark:bg-gray-900/80">
-//                     <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-//                         <div>
-//                             <p className="text-sm font-semibold uppercase tracking-[0.25em] text-red-500">RedPulse Dashboard</p>
-//                             <h1 className="mt-2 text-3xl font-semibold text-gray-900 sm:text-4xl dark:text-white">
-//                                 Welcome back, {userData?.fullName} <span className="text-red-500">❤️</span>
-//                             </h1>
-//                             <p className="mt-3 max-w-2xl text-sm text-gray-600 sm:text-base dark:text-gray-400">
-//                                 Your donor profile is in great shape. Keep helping save lives with your next donation.
-//                             </p>
-//                         </div>
-
-//                         <div className="flex items-center gap-3 rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-800 dark:bg-gray-800/70">
-//                             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-red-500 to-rose-600 text-lg font-semibold text-white">
-//                                 {initials}
-//                             </div>
-//                             <div>
-//                                 <p className="text-sm font-semibold text-gray-900 dark:text-white">{userData?.fullName}</p>
-//                                 <p className="text-xs text-gray-500 dark:text-gray-400">
-//                                     {userData?.createdAt ? new Date(userData.createdAt).toLocaleDateString() : 'N/A'}
-//                                 </p>
-//                             </div>
-//                         </div>
-//                     </div>
-//                 </header>
-
-//                 <section className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-//                     {/* Left Column */}
-//                     <div className="space-y-6">
-//                         <div className="rounded-[28px] border border-gray-200/70 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-//                             <div className="flex items-center justify-between">
-//                                 <div>
-//                                     <p className="text-sm font-semibold uppercase tracking-[0.2em] text-red-500">Profile Summary</p>
-//                                     <h2 className="mt-2 text-xl font-semibold text-gray-900 dark:text-white">Your donor profile</h2>
-//                                 </div>
-//                                 <button
-//                                     onClick={handleEditProfile}
-//                                     className="rounded-full bg-red-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-600 shadow-sm hover:shadow-md hover:shadow-red-500/25 active:scale-95"
-//                                 >
-//                                     Edit Profile
-//                                 </button>
-//                             </div>
-
-//                             <div className="mt-6 grid gap-6 lg:grid-cols-[220px_1fr]">
-//                                 {/* Profile Card */}
-//                                 <div className="rounded-[24px] bg-gradient-to-br from-red-500 to-rose-600 p-5 text-white">
-//                                     <div className="flex h-20 w-20 items-center justify-center rounded-full border-4 border-white/30 bg-white/20 text-3xl font-semibold">
-//                                         {initials}
-//                                     </div>
-//                                     <div className="mt-5">
-//                                         <p className="text-lg font-semibold">{userData?.fullName || 'Unknown'}</p>
-//                                         <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-white/20 px-3 py-1 text-sm text-red-50">
-//                                             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-//                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14c-4.418 0-8 2.239-8 5v1h16v-1c0-2.761-3.582-5-8-5z" />
-//                                             </svg>
-//                                             {userData?.gender || 'Not specified'}
-//                                         </div>
-//                                         <p className="mt-2 text-sm text-red-50">Blood Donor • Verified</p>
-//                                     </div>
-//                                 </div>
-
-//                                 {/* Info Grid */}
-//                                 <div className="grid gap-3 sm:grid-cols-2">
-//                                     {[
-//                                         ["Blood Group", userData?.bloodGroup],
-//                                         ["Age", userData?.age],
-//                                         ["Gender", userData?.gender],
-//                                         ["Phone", userData?.phoneNumber],
-//                                         ["Email", userData?.email],
-//                                         ["Division", userData?.division],
-//                                         ["District", userData?.district],
-//                                         ["Upazila", userData?.upazila],
-//                                         ["Union", userData?.union],
-//                                         ["Member Since", userData?.createdAt ? new Date(userData.createdAt).toLocaleDateString() : 'N/A'],
-//                                     ].map(([label, value]) => (
-//                                         <div key={label} className="rounded-2xl border border-gray-200 bg-gray-50 p-3 dark:border-gray-800 dark:bg-gray-800/70 hover:border-red-200 dark:hover:border-red-800 transition-colors group">
-//                                             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gray-500 dark:text-gray-400 group-hover:text-red-500 transition-colors">{label}</p>
-//                                             <p className="mt-1 text-sm font-semibold text-gray-900 dark:text-white">{value || '—'}</p>
-//                                         </div>
-//                                     ))}
-//                                 </div>
-//                             </div>
-//                         </div>
-//                     </div>
-
-//                     {/* Right Column */}
-//                     <div className="space-y-6">
-//                         <div className="rounded-[28px] border border-gray-200/70 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-//                             <div className="flex items-center justify-between">
-//                                 <div>
-//                                     <p className="text-sm font-semibold uppercase tracking-[0.2em] text-red-500">Availability</p>
-//                                     <h2 className="mt-2 text-xl font-semibold text-gray-900 dark:text-white">Ready to donate</h2>
-//                                 </div>
-//                                 <label className="relative inline-flex cursor-pointer items-center">
-//                                     <input
-//                                         checked={availability}
-//                                         onChange={handleAvailability}
-//                                         type="checkbox"
-//                                         className="peer sr-only"
-//                                     />
-//                                     <div className="h-7 w-12 rounded-full bg-gray-200 transition-all duration-300 peer-checked:bg-red-500 dark:bg-gray-700" />
-//                                     <div className="absolute left-1 top-1 h-5 w-5 rounded-full bg-white shadow-sm transition-all duration-300 peer-checked:translate-x-5" />
-//                                 </label>
-//                             </div>
-
-//                             <div className="mt-6 rounded-[24px] border border-gray-200 bg-gray-50 p-5 dark:border-gray-800 dark:bg-gray-800/70">
-//                                 <div className="flex items-center justify-between">
-//                                     <div>
-//                                         <p className="text-sm text-gray-500 dark:text-gray-400">Current Status</p>
-//                                         <p className={`mt-1 text-lg font-semibold transition-colors ${availability ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
-//                                             {availability ? 'Available' : 'Unavailable'}
-//                                         </p>
-//                                     </div>
-//                                     <div className={`h-3 w-3 rounded-full transition-colors ${availability ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`} />
-//                                 </div>
-//                                 <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">
-//                                     Last updated: {availability ? 'Online' : 'Offline'}
-//                                 </p>
-//                             </div>
-//                         </div>
-//                     </div>
-//                 </section>
-//             </div>
-//         </div>
-//     );
-// };
-
-// export default Dashboard;
-
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useGetUserProfileQuery, useUpdateAvailabilityMutation } from '../redux/features/users/usersApiSlice'
+import { useGetMyContactRequestsQuery } from '../redux/features/auth/authApiSlice' // NEW IMPORT
 import Toast from '../components/Toast';
 import ErrorState from '../components/Error';
 import EmptyState from '../components/Empty';
@@ -488,6 +255,12 @@ const Dashboard = () => {
     const { data: user, isLoading, isError, error, refetch } = useGetUserProfileQuery();
     const [updateAvailability] = useUpdateAvailabilityMutation();
 
+    const { data: contactRequests } = useGetMyContactRequestsQuery();
+
+    // Calculate pending notifications
+    const pendingCount = contactRequests?.data?.filter(r => r.status === "PENDING")?.length || 0;
+
+
     const [availability, setAvailability] = useState(false);
     const [toast, setToast] = useState(null);
 
@@ -545,7 +318,7 @@ const Dashboard = () => {
 
             <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
                 {/* ==================== TOP HEADER ==================== */}
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+                {/* <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
                     <div>
                         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
                             Dashboard
@@ -559,6 +332,42 @@ const Dashboard = () => {
                             <IconBell className="w-5 h-5" />
                             <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500" />
                         </button>
+                        <button
+                            onClick={() => navigate('/dashboard/profile')}
+                            className="flex items-center gap-2 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 px-4 py-2.5 text-sm font-medium hover:border-red-300 dark:hover:border-red-800 transition shadow-sm"
+                        >
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-red-500 to-rose-600 flex items-center justify-center text-white font-bold text-xs">
+                                {initials}
+                            </div>
+                            <span className="hidden sm:inline text-gray-700 dark:text-gray-300">View Profile</span>
+                        </button>
+                    </div>
+                </div> */}
+
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+                    <div>
+                        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+                            Dashboard
+                        </h1>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                            Welcome back, <span className="font-medium text-red-500">{userData?.fullName}</span>
+                        </p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        {/* UPDATED: Notification Bell with real count */}
+                        <button
+                            onClick={() => navigate('/dashboard/notifications')}
+                            className="relative p-2.5 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-gray-500 dark:text-gray-400 hover:text-red-500 transition shadow-sm"
+                        >
+                            <IconBell className="w-5 h-5" />
+                            {/* Badge - only show if pending count > 0 */}
+                            {pendingCount > 0 && (
+                                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center bg-red-500 text-white text-[10px] font-bold rounded-full px-1">
+                                    {pendingCount > 99 ? '99+' : pendingCount}
+                                </span>
+                            )}
+                        </button>
+
                         <button
                             onClick={() => navigate('/dashboard/profile')}
                             className="flex items-center gap-2 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 px-4 py-2.5 text-sm font-medium hover:border-red-300 dark:hover:border-red-800 transition shadow-sm"

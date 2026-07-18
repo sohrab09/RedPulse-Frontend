@@ -18,6 +18,8 @@ import Profile from './pages/Profile.jsx'
 
 import ProtectedRoute from './components/ProtectedRoute.jsx'
 import EditProfile from './pages/EditProfile.jsx'
+// import NotificationBadge from './components/NotificationBadge.jsx'
+import NotificationsPage from './pages/NotificationsPage.jsx'
 
 // Pages without footer
 const NO_FOOTER_ROUTES = ['/login']
@@ -73,6 +75,7 @@ export default function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/dashboard/profile" element={<Profile />} />
             <Route path="/dashboard/edit-profile" element={<EditProfile />} />
+            <Route path="/dashboard/notifications" element={<NotificationsPage />} />
           </Route>
 
           <Route path="*" element={<NotFound />} />
