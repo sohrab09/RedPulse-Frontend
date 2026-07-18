@@ -35,6 +35,10 @@ export const authApi = createApi({
             }),
         }),
 
+        getUserProfile: builder.query({
+            query: () => "/users/me/profile",
+        }),
+
         updateAvailability: builder.mutation({
             query: (isAvailable) => ({
                 url: "/users/me/availability",
@@ -47,4 +51,4 @@ export const authApi = createApi({
     }),
 });
 
-export const { useRegisterUserMutation, useGetUsersQuery, useLoginUserMutation, useUpdateAvailabilityMutation } = authApi;
+export const { useRegisterUserMutation, useGetUsersQuery, useLoginUserMutation, useGetUserProfileQuery, useUpdateAvailabilityMutation } = authApi;

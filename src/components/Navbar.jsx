@@ -177,15 +177,6 @@ export default function Navbar({ darkMode, setDarkMode, isLoggedIn, setIsLoggedI
                       </div>
 
                       <Link
-                        to="/dashboard/profile"
-                        onClick={() => setProfileOpen(false)}
-                        className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition"
-                      >
-                        <span className="text-lg">👤</span>
-                        <span className="text-sm font-medium">My Profile</span>
-                      </Link>
-
-                      <Link
                         to="/dashboard"
                         onClick={() => setProfileOpen(false)}
                         className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition"
@@ -195,6 +186,25 @@ export default function Navbar({ darkMode, setDarkMode, isLoggedIn, setIsLoggedI
                       </Link>
 
                       <Link
+                        to="/dashboard/profile"
+                        onClick={() => setProfileOpen(false)}
+                        className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition"
+                      >
+                        <span className="text-lg">👤</span>
+                        <span className="text-sm font-medium">My Profile</span>
+                      </Link>
+
+                      {/* Edit Profile */}
+                      <Link
+                        to="/dashboard/edit-profile"
+                        onClick={() => setProfileOpen(false)}
+                        className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition"
+                      >
+                        <span className="text-lg">📝</span>
+                        <span className="text-sm font-medium">Edit Profile</span>
+                      </Link>
+
+                      {/* <Link
                         to="/dashboard/donations"
                         onClick={() => setProfileOpen(false)}
                         className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition"
@@ -210,7 +220,7 @@ export default function Navbar({ darkMode, setDarkMode, isLoggedIn, setIsLoggedI
                       >
                         <span className="text-lg">⚙️</span>
                         <span className="text-sm font-medium">Settings</span>
-                      </Link>
+                      </Link> */}
 
                       <div className="border-t border-gray-100 dark:border-gray-800">
                         <button
