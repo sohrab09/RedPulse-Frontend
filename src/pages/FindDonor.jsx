@@ -35,19 +35,24 @@ export default function FindDonor() {
   }, [data]);
 
   const locationOptions = useMemo(() => {
-    const uniqueLocations = new Set(
-      formattedDonors
-        .map((donor) => donor.location)
-        .filter(Boolean)
-    );
+    const uniqueLocations = new Set(['All']);
+
+    formattedDonors.forEach((donor) => {
+      if (donor.district) uniqueLocations.add(donor.district);
+      if (donor.upazila) uniqueLocations.add(donor.upazila);
+      if (donor.union) uniqueLocations.add(donor.union);
+      if (donor.location && donor.location !== 'Location not shared') {
+        uniqueLocations.add(donor.location);
+      }
+    });
 
     const fallbackLocations = Array.isArray(mockLocations) ? mockLocations : [];
-    fallbackLocations
-      .filter((loc) => loc !== 'All')
-      .forEach((loc) => uniqueLocations.add(loc));
+    fallbackLocations.forEach((loc) => {
+      if (loc !== 'All') uniqueLocations.add(loc);
+    });
 
-    return ['All', ...Array.from(uniqueLocations)];
-  }, [formattedDonors, mockLocations]);
+    return Array.from(uniqueLocations);
+  }, [formattedDonors]);
 
   useEffect(() => {
     const b = searchParams.get('blood')

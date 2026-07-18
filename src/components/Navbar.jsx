@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import logo from '../assets/logo.png';
+import { useGetUserProfileQuery } from '../redux/features/users/usersApiSlice'
 
 const navLinks = [
   { to: '/', label: 'Home' },
@@ -11,6 +12,9 @@ const navLinks = [
 ]
 
 export default function Navbar({ darkMode, setDarkMode, isLoggedIn, setIsLoggedIn }) {
+
+  const { data: user, isLoading, isError, error, refetch } = useGetUserProfileQuery();
+  const userData = user?.data;
   const [mobileOpen, setMobileOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false);
@@ -59,6 +63,13 @@ export default function Navbar({ darkMode, setDarkMode, isLoggedIn, setIsLoggedI
       navigate('/dashboard')
     }
   };
+
+  const initials = userData?.fullName
+    ?.split(" ")
+    .map((n) => n[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase() || 'U';
 
   return (
     <>
@@ -141,7 +152,7 @@ export default function Navbar({ darkMode, setDarkMode, isLoggedIn, setIsLoggedI
                     aria-haspopup="true"
                   >
                     <div className="w-10 h-10 rounded-full bg-red-500 flex items-center justify-center text-white font-bold">
-                      S
+                      {initials}
                     </div>
                     <svg
                       className={`w-4 h-4 transition-transform duration-200 ${profileOpen ? "rotate-180" : ""}`}
@@ -163,14 +174,14 @@ export default function Navbar({ darkMode, setDarkMode, isLoggedIn, setIsLoggedI
                       <div className="px-5 py-4 border-b border-gray-100 dark:border-gray-800">
                         <div className="flex items-center gap-3">
                           <div className="w-12 h-12 rounded-full bg-red-500 flex items-center justify-center text-white font-bold text-lg">
-                            S
+                            {initials}
                           </div>
                           <div>
                             <h4 className="font-semibold text-gray-900 dark:text-white">
-                              Mohammad Sohrab Hossain
+                              {userData?.fullName}
                             </h4>
                             <p className="text-xs text-gray-500">
-                              sohrab@gmail.com
+                              {userData?.email}
                             </p>
                           </div>
                         </div>

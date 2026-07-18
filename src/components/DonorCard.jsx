@@ -49,18 +49,27 @@ function formatLastSeen(dateString) {
 }
 
 function BlockTimer({ onExpire }) {
-  const [timeLeft, setTimeLeft] = useState(rateLimitStorage.getFormattedRemainingTime());
+  const [timeLeft, setTimeLeft] = useState(() => rateLimitStorage.getFormattedRemainingTime());
+
   useEffect(() => {
+    if (rateLimitStorage.getRemainingTime() <= 0) {
+      onExpire();
+      return;
+    }
+
     const interval = setInterval(() => {
-      if (rateLimitStorage.getRemainingTime() <= 0) {
+      const remaining = rateLimitStorage.getRemainingTime();
+      if (remaining <= 0) {
         clearInterval(interval);
         onExpire();
         return;
       }
       setTimeLeft(rateLimitStorage.getFormattedRemainingTime());
     }, 1000);
+
     return () => clearInterval(interval);
   }, [onExpire]);
+
   return <span className="text-xs font-medium text-amber-600 dark:text-amber-400">Retry in {timeLeft}</span>;
 }
 
@@ -69,7 +78,7 @@ export default function DonorCard({ donor }) {
   const [contacted, setContacted] = useState(false);
   const [isBlocked, setIsBlocked] = useState(rateLimitStorage.isBlocked());
   const [error, setError] = useState(null);
-  const [showModal, setShowModal] = useState(false);  // ✅ Modal state
+  const [showModal, setShowModal] = useState(false);
 
   const [createContactRequest, { isLoading: isSending }] = useCreateContactRequestMutation();
 
@@ -103,6 +112,13 @@ export default function DonorCard({ donor }) {
     return () => clearInterval(interval);
   }, []);
 
+  // ✅ FIX: isBlocked true হলে Modal auto-close
+  useEffect(() => {
+    if (isBlocked && showModal) {
+      setShowModal(false);
+    }
+  }, [isBlocked, showModal]);
+
   const handleBlockExpire = useCallback(() => {
     setIsBlocked(false);
     setError(null);
@@ -113,9 +129,15 @@ export default function DonorCard({ donor }) {
     setForm(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setError(null);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const cleanValue = (val) => val === "" ? null : val;
+
     if (rateLimitStorage.isBlocked()) {
       setError(`Please wait ${rateLimitStorage.getFormattedRemainingTime()} before sending another request.`);
       return;
@@ -143,11 +165,12 @@ export default function DonorCard({ donor }) {
 
       setContacted(true);
       setShowModal(false);
+      setError(null);
     } catch (err) {
       if (err.status === 429) {
         rateLimitStorage.setBlock();
         setIsBlocked(true);
-        setError(`Too many requests! Blocked for ${rateLimitStorage.getFormattedRemainingTime()}. Please login for unlimited requests.`);
+        setError(`Too many requests! Blocked for ${rateLimitStorage.getFormattedRemainingTime()}.`);
       } else if (err.status === 401) {
         setError("Please login to send contact requests.");
       } else {
@@ -225,8 +248,8 @@ export default function DonorCard({ donor }) {
           ) : "Recently joined"}
         </div>
 
-        {/* Error */}
-        {error && (
+        {/* ✅ Error — শুধু Modal বন্ধ থাকলে কার্ডে দেখাও */}
+        {error && !showModal && (
           <div className="mb-3 p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-700 dark:text-amber-400 text-center">
             <div className="flex items-center justify-center gap-1.5 mb-1">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -236,11 +259,10 @@ export default function DonorCard({ donor }) {
             </div>
             {error}
             {isBlocked && <div className="mt-2 pt-2 border-t border-amber-200"><BlockTimer onExpire={handleBlockExpire} /></div>}
-            <button onClick={() => navigate('/login')} className="mt-2 text-xs font-semibold text-red-500 hover:text-red-600 underline">Login for unlimited requests →</button>
           </div>
         )}
 
-        {/* Contact Button - opens modal */}
+        {/* Contact Button */}
         {!isBlocked && (
           <button
             onClick={() => setShowModal(true)}
@@ -277,7 +299,7 @@ export default function DonorCard({ donor }) {
         )}
       </div>
 
-      {/* ✅ MODAL */}
+      {/* ✅ MODAL — isBlocked হলে auto-close হবে effect দিয়ে */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
           <div className="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
@@ -287,12 +309,39 @@ export default function DonorCard({ donor }) {
                 <h2 className="text-lg font-bold text-gray-900 dark:text-white">Request Blood Donation</h2>
                 <p className="text-xs text-gray-500 dark:text-gray-400">To: {donor.name} • {donor.blood}</p>
               </div>
-              <button onClick={() => setShowModal(false)} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition">
+              <button onClick={handleCloseModal} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition">
                 <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
+
+            {/* ✅ Error Alert — Modal এর ভিতরে */}
+            {error && (
+              <div className="mx-5 mt-4 p-3 bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800 rounded-xl">
+                <div className="flex items-start gap-2">
+                  <svg className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-red-600 dark:text-red-400">{error}</p>
+                    {isBlocked && (
+                      <p className="text-xs text-red-500 dark:text-red-400 mt-1">
+                        <BlockTimer onExpire={handleBlockExpire} />
+                      </p>
+                    )}
+                    {error.includes("login") && (
+                      <button
+                        onClick={() => { setShowModal(false); navigate('/login'); }}
+                        className="mt-2 text-xs font-semibold text-red-600 hover:text-red-700 underline"
+                      >
+                        Login for unlimited requests →
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Modal Form */}
             <form onSubmit={handleSubmit} className="p-5 space-y-4">
@@ -416,7 +465,7 @@ export default function DonorCard({ donor }) {
 
               {/* Submit */}
               <div className="flex gap-3 pt-2">
-                <button type="button" onClick={() => setShowModal(false)}
+                <button type="button" onClick={handleCloseModal}
                   className="flex-1 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-800 transition">
                   Cancel
                 </button>
