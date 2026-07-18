@@ -234,7 +234,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useGetUserProfileQuery, useUpdateAvailabilityMutation } from '../redux/features/users/authApiSlice'
+import { useGetUserProfileQuery, useUpdateAvailabilityMutation } from '../redux/features/users/usersApiSlice'
 import Toast from '../components/Toast';
 import ErrorState from '../components/Error';
 import EmptyState from '../components/Empty';

@@ -6,7 +6,7 @@ import {
     useGetUpazilasQuery,
     useGetUnionsQuery,
 } from "../redux/features/geo/geoApi";
-import { useGetUserProfileQuery } from '../redux/features/users/authApiSlice'
+import { useGetUserProfileQuery } from '../redux/features/users/usersApiSlice'
 
 // ==================== ICONS ====================
 const IconArrowLeft = ({ className }) => (

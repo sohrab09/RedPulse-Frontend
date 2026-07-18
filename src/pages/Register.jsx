@@ -10,7 +10,7 @@ import {
   useGetUpazilasQuery,
   useGetUnionsQuery,
 } from "../redux/features/geo/geoApi";
-import { useRegisterUserMutation } from '../redux/features/users/authApiSlice.js'
+import { useRegisterUserMutation } from '../redux/features/auth/authApiSlice.js'
 
 // ─── constants ────────────────────────────────────────────────────────────────
 

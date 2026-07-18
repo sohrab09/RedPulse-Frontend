@@ -1,10 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { geoApi } from "../redux/features/geo/geoApi";
-import { authApi } from "../redux/features/users/authApiSlice";
+import { usersApi } from "../redux/features/users/usersApiSlice";
+import { authApi } from "../redux/features/auth/authApiSlice";
 
 export const store = configureStore({
     reducer: {
         [geoApi.reducerPath]: geoApi.reducer,
+        [usersApi.reducerPath]: usersApi.reducer,
         [authApi.reducerPath]: authApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>
@@ -15,5 +17,6 @@ export const store = configureStore({
             }
         )
             .concat(geoApi.middleware)
-            .concat(authApi.middleware),
+            .concat(usersApi.middleware)
+            .concat(authApi.middleware)
 });

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useGetUserProfileQuery } from '../redux/features/users/authApiSlice'
+import { useGetUserProfileQuery } from '../redux/features/users/usersApiSlice'
 import { IconActivity, IconAward, IconCalendar, IconCheck, IconDroplet, IconEdit, IconHeart, IconMail, IconMapPin, IconPhone, IconShare, IconShield, IconUser } from '../icons/icons';
 
 // ==================== LOADING SKELETON ====================

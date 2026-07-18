@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import Input from '../components/Input.jsx'
 import Button from '../components/Button.jsx'
 import Toast from '../components/Toast.jsx'
-import { useLoginUserMutation } from '../redux/features/users/authApiSlice.js'
+import { useLoginUserMutation } from '../redux/features/auth/authApiSlice.js'
 
 const MOCK_CREDENTIALS = { email: 'donor@redpulse.org', password: 'blood123' }
 

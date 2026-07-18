@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import DonorCard from '../components/DonorCard.jsx'
 import { bloodGroups, locations as mockLocations } from '../data/mockData.js'
-import { useGetUsersQuery } from '../redux/features/users/authApiSlice.js';
+import { useGetUsersQuery } from '../redux/features/auth/authApiSlice.js';
 
 export default function FindDonor() {
   const { data, isLoading, error } = useGetUsersQuery();
