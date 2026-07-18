@@ -33,8 +33,18 @@ export const authApi = createApi({
                 method: "POST",
                 body: data,
             }),
-        })
+        }),
+
+        updateAvailability: builder.mutation({
+            query: (isAvailable) => ({
+                url: "/users/me/availability",
+                method: "PATCH",
+                body: {
+                    isAvailable,
+                },
+            }),
+        }),
     }),
 });
 
-export const { useRegisterUserMutation, useGetUsersQuery, useLoginUserMutation } = authApi;
+export const { useRegisterUserMutation, useGetUsersQuery, useLoginUserMutation, useUpdateAvailabilityMutation } = authApi;

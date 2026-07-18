@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react'
+import { useUpdateAvailabilityMutation } from '../redux/features/users/authApiSlice'
 
 const stats = [
     {
@@ -67,11 +68,26 @@ const tips = [
 ]
 
 export default function Dashboard() {
+
+    const [updateAvailability] = useUpdateAvailabilityMutation();
+
     const [availability, setAvailability] = useState(true)
     const [tipIndex, setTipIndex] = useState(0)
 
     const progress = useMemo(() => Math.min(100, 70), [])
     const currentTip = tips[tipIndex % tips.length]
+
+    const handleAvailability = async () => {
+        const newValue = !availability;
+
+        try {
+            await updateAvailability(newValue).unwrap();
+
+            setAvailability(newValue);
+        } catch (err) {
+            console.log(err);
+        }
+    };
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-red-50/40 px-4 py-6 sm:px-6 lg:px-8 dark:from-gray-950 dark:via-gray-900 dark:to-red-950/20">
@@ -208,7 +224,12 @@ export default function Dashboard() {
                                     <h2 className="mt-2 text-xl font-semibold text-gray-900 dark:text-white">Ready to donate</h2>
                                 </div>
                                 <label className="relative inline-flex cursor-pointer items-center">
-                                    <input checked={availability} onChange={() => setAvailability(!availability)} type="checkbox" className="peer sr-only" />
+                                    <input
+                                        checked={availability}
+                                        onChange={handleAvailability}
+                                        type="checkbox"
+                                        className="peer sr-only"
+                                    />
                                     <div className="h-7 w-12 rounded-full bg-gray-200 transition peer-checked:bg-red-500 dark:bg-gray-700" />
                                     <div className="absolute left-1 top-1 h-5 w-5 rounded-full bg-white transition peer-checked:translate-x-5" />
                                 </label>

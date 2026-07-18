@@ -28,7 +28,7 @@ export default function FindDonor() {
       role: user.role || 'USER',
       gender: user.gender || 'Others',
       lastDonated: user.updatedAt || user.createdAt || null,
-      available: true,
+      available: user.isAvailable || false,
     }));
   }, [data]);
 
