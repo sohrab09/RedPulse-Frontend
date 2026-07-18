@@ -6,7 +6,7 @@ import {
     useGetUpazilasQuery,
     useGetUnionsQuery,
 } from "../redux/features/geo/geoApi";
-import { useGetUserProfileQuery } from '../redux/features/users/usersApiSlice'
+import { useGetUserProfileQuery, useUpdateUserProfileMutation } from '../redux/features/users/usersApiSlice'
 
 // ==================== ICONS ====================
 const IconArrowLeft = ({ className }) => (
@@ -121,6 +121,7 @@ const SectionHeader = ({ number, title, icon: Icon }) => (
 const EditProfile = () => {
     const navigate = useNavigate();
     const { data: user, isLoading: isUserLoading } = useGetUserProfileQuery();
+    const [updateUserProfile] = useUpdateUserProfileMutation();
 
     // Geo Queries
     const { data: divisionsData } = useGetDivisionsQuery();
@@ -271,6 +272,7 @@ const EditProfile = () => {
         setIsSaving(true);
 
         const payload = {
+            id: user?.data?._id || user?.data?.id,
             fullName: form.fullName.trim(),
             age: Number(form.age),
             gender: form.gender,
@@ -284,7 +286,7 @@ const EditProfile = () => {
 
         try {
             // TODO: Replace with actual API call
-            // await updateProfile(payload).unwrap();
+            await updateUserProfile(payload).unwrap();
             await new Promise(resolve => setTimeout(resolve, 1500));
 
             setSavedSuccess(true);
@@ -415,7 +417,7 @@ const EditProfile = () => {
                                     { value: '', label: 'Select gender' },
                                     { value: 'Male', label: 'Male' },
                                     { value: 'Female', label: 'Female' },
-                                    { value: 'Others', label: 'Others' },
+                                    { value: 'Other', label: 'Other' },
                                 ]}
                             />
                         </div>
