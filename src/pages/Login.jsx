@@ -5,7 +5,7 @@ import Button from '../components/Button.jsx'
 import Toast from '../components/Toast.jsx'
 import { useLoginUserMutation } from '../redux/features/auth/authApiSlice.js'
 
-const MOCK_CREDENTIALS = { email: 'donor@redpulse.org', password: 'blood123' }
+const MOCK_CREDENTIALS = { email: 'himelmahmud007.hm@gmail.com', password: '123456' }
 
 function isEmailInput(value) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
@@ -60,7 +60,7 @@ export default function Login({ setIsLoggedIn }) {
         : { phoneNumber: identifier, password: form.password }
 
       const response = await loginUser(payload).unwrap()
-      console.log("response", response)
+      // console.log("response", response)
       const token = response?.data?.token
       if (token) {
         localStorage.setItem('redpulse_token', token)
@@ -108,8 +108,8 @@ export default function Login({ setIsLoggedIn }) {
           <div>
             <p className="text-amber-800 dark:text-amber-300 text-xs font-semibold mb-1">Demo credentials</p>
             <p className="text-amber-700 dark:text-amber-400 text-xs">
-              Email: <code className="bg-amber-100 dark:bg-amber-900/50 px-1 rounded">donor@redpulse.org</code><br />
-              Password: <code className="bg-amber-100 dark:bg-amber-900/50 px-1 rounded">blood123</code>
+              Email: <code className="bg-amber-100 dark:bg-amber-900/50 px-1 rounded">himelmahmud007.hm@gmail.com</code><br />
+              Password: <code className="bg-amber-100 dark:bg-amber-900/50 px-1 rounded">123456</code>
             </p>
             <button onClick={fillDemo} className="text-xs text-amber-600 dark:text-amber-400 font-bold hover:underline mt-1 cursor-pointer">
               Fill automatically →
