@@ -1,7 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { geoApi } from "../redux/features/geo/geoApi";
-import { usersApi } from "../redux/features/users/usersApiSlice";
-import { authApi } from "../redux/features/auth/authApiSlice";
+import { geoApi } from "../features/geo/geoApi";
+import { usersApi } from "../features/users/usersApiSlice";
+import { authApi } from "../features/auth/authApiSlice";
 
 export const store = configureStore({
     reducer: {
