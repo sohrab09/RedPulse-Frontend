@@ -517,12 +517,26 @@ const Dashboard = () => {
                         {/* Quick Profile Summary */}
                         <div className="rounded-2xl bg-gradient-to-br from-red-500 to-rose-600 p-6 text-white shadow-lg shadow-red-500/20">
                             <div className="flex items-center gap-3 mb-4">
-                                <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-xl font-bold">
+                                <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-xl font-bold text-white">
                                     {initials}
                                 </div>
                                 <div>
-                                    <p className="font-semibold">{userData?.fullName}</p>
-                                    <p className="text-xs text-red-100">Blood Donor • Verified</p>
+                                    <div className="flex items-center gap-1.5">
+                                        <p className="font-semibold text-white">{userData?.fullName}</p>
+                                        {userData?.isEmailVerified && (
+                                            <span title="Verified Account" className="inline-flex items-center justify-center w-4 h-4 bg-blue-500 rounded-full">
+                                                <svg className="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                                </svg>
+                                            </span>
+                                        )}
+                                    </div>
+                                    <p className="text-xs text-red-100">
+                                        {userData?.isEmailVerified
+                                            ? "Verified Member"
+                                            : "Email Not Verified"
+                                        }
+                                    </p>
                                 </div>
                             </div>
                             <div className="grid grid-cols-2 gap-3 mb-4">
