@@ -4,7 +4,11 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const baseQuery = fetchBaseQuery({
     baseUrl: API_BASE_URL,
+
     prepareHeaders: (headers) => {
+
+        if (!token) return;
+
         const token = localStorage.getItem("redpulse_token");
 
         if (token) {
