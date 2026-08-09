@@ -7,8 +7,6 @@ const baseQuery = fetchBaseQuery({
 
     prepareHeaders: (headers) => {
 
-        if (!token) return;
-
         const token = localStorage.getItem("redpulse_token");
 
         if (token) {
